@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use anyhow::Result;
 use std::fs::File;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Person {
     name: String,
     age: u8,
@@ -31,6 +31,12 @@ fn typed_example() -> Result<()> {
 
     // Do things just like with any other Rust data structure.
     println!("Please call {} at the number {}", p.name, p.phones[0]);
+
+    // load the Person.json from File
+    let file = File::open("../Person.json")?;
+    let p: Person = serde_json::from_reader(file)?;
+    println!("{:#?}", p);
+
 
     Ok(())
 }
