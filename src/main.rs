@@ -52,6 +52,9 @@ fn json_pointer() {
     let value = serde_json::from_str::<serde_json::Value>(DATA).unwrap();
     let pv = value.pointer("/phones/0");
     println!("JSON pointer '/phones/0' gives: {:?}", pv);
+
+    let pv_unk = value.pointer("/unk/to/unk");
+    println!("JSON pointer '/unk/to/unk' gives: {:?}", pv_unk);
 }
 
 fn main() {
