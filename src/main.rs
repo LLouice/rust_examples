@@ -1,4 +1,5 @@
 mod map_v;
+mod utils;
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
@@ -23,6 +24,8 @@ const DATA: &str = r#"
     }"#;
 
 fn json_to_struct() -> Result<()> {
+    let fn_name = std::any::type_name_of_val(&json_to_struct);
+    utils::print_section_header(fn_name);
     // Parse the string of data into a Person object.
     let p: Person =
         serde_json::from_str(DATA).context("Failed to parse JSON into Person struct")?;
@@ -45,19 +48,26 @@ fn json_to_struct() -> Result<()> {
         .context("Failed to deserialize JSON from file into Person struct")?;
     println!("{:#?}", p);
 
+    utils::print_section_header(&format!("{} end", fn_name));
+
     Ok(())
 }
 
 fn json_pointer() {
+    let fn_name = std::any::type_name_of_val(&json_to_struct);
+    utils::print_section_header(fn_name);
+
     let value = serde_json::from_str::<serde_json::Value>(DATA).unwrap();
     let pv = value.pointer("/phones/0");
     println!("JSON pointer '/phones/0' gives: {:?}", pv);
 
     let pv_unk = value.pointer("/unk/to/unk");
     println!("JSON pointer '/unk/to/unk' gives: {:?}", pv_unk);
+    utils::print_section_header(&format!("{} end", fn_name));
 }
 
 fn main() {
     json_to_struct().expect("typed_example failed!");
     json_pointer();
+    map_v::map_v();
 }
