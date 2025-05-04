@@ -1,5 +1,7 @@
-use serde::{Deserialize, Serialize};
+mod map_v;
+
 use anyhow::{Context, Result};
+use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::path::Path;
 
@@ -10,21 +12,20 @@ struct Person {
     phones: Vec<String>,
 }
 
-fn typed_example() -> Result<()> {
-    // Some JSON input data as a &str. Maybe this comes from the user.
-    let data = r#"
-        {
-            "name": "John Doe",
-            "age": 43,
-            "phones": [
-                "+44 1234567",
-                "+44 2345678"
-            ]
-        }"#;
+const DATA: &str = r#"
+    {
+        "name": "John Doe",
+        "age": 43,
+        "phones": [
+            "+44 1234567",
+            "+44 2345678"
+        ]
+    }"#;
 
+fn json_to_struct() -> Result<()> {
     // Parse the string of data into a Person object.
-    let p: Person = serde_json::from_str(data)
-        .context("Failed to parse JSON into Person struct")?;
+    let p: Person =
+        serde_json::from_str(DATA).context("Failed to parse JSON into Person struct")?;
 
     // Serialize the Person object back to JSON
     // Create and write directly to the file using serde_json::to_writer_pretty
@@ -38,8 +39,8 @@ fn typed_example() -> Result<()> {
     println!("Please call {} at the number {}", p.name, p.phones[0]);
 
     // load the Person.json from File
-    let file = File::open(file_path)
-        .with_context(|| format!("Failed to open file at {:?}", file_path))?;
+    let file =
+        File::open(file_path).with_context(|| format!("Failed to open file at {:?}", file_path))?;
     let p: Person = serde_json::from_reader(file)
         .context("Failed to deserialize JSON from file into Person struct")?;
     println!("{:#?}", p);
@@ -47,6 +48,13 @@ fn typed_example() -> Result<()> {
     Ok(())
 }
 
+fn json_pointer() {
+    let value = serde_json::from_str::<serde_json::Value>(DATA).unwrap();
+    let pv = value.pointer("/phones/0");
+    println!("JSON pointer '/phones/0' gives: {:?}", pv);
+}
+
 fn main() {
-    typed_example().expect("typed_example failed!");
+    json_to_struct().expect("typed_example failed!");
+    json_pointer();
 }
